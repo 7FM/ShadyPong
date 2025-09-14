@@ -102,6 +102,7 @@ module top (
         .BG_COL_R(BG_COL_R), .BG_COL_G(BG_COL_G), .BG_COL_B(BG_COL_B)
     ) pixelCreator (
         .pixIf_CLK(pixelCLK),
+        .rst_n(rst_n),
         .pixIf_NEXT_FRAME(pixelBus_NEXT_FRAME),
         .pixIf_H_BLANKING(pixelBus_H_BLANKING),
         .pixIf_H_CNT(pixelBus_H_CNT),
@@ -132,6 +133,7 @@ module top (
         .V_CNT_WID(LOG_V_SIZE)
     ) vgaController(
         .CLK(pixelCLK),
+        .rst_n(rst_n),
         .pixIf_NEXT_FRAME(pixelBus_NEXT_FRAME),
         .pixIf_H_BLANKING(pixelBus_H_BLANKING),
         .pixIf_H_CNT(pixelBus_H_CNT),

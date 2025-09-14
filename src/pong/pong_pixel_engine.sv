@@ -53,6 +53,7 @@ module pong_pixel_engine
         .BALL_WIDTH_LOG(BALL_WIDTH_LOG)
     ) gameEngine (
         .pixIf_CLK(pixIf_CLK),
+        .rst_n(rst_n),
         .pixIf_NEXT_FRAME(pixIf_NEXT_FRAME),
         .player1YUp(player1YUp), 
         .player1YDown(player1YDown),
@@ -99,6 +100,7 @@ module pong_pixel_engine
         .BALL_PIXSIZE(BALL_PIXSIZE)
     ) yPosChecker (
         .CLK(pixIf_CLK),
+        .rst_n(rst_n),
         .H_BLANK(pixIf_H_BLANKING),
         .nextY(pixIf_next_V_CNT),
         .ballYPos(ballYPos),
@@ -116,6 +118,7 @@ module pong_pixel_engine
         .X_OFF(0)
     ) checkPlayer1 (
         .CLK(pixIf_CLK),
+        .rst_n(rst_n),
         .drawX(pixIf_H_CNT),
         .isValidY(isPlayer1Y),
         .isPlayerPos(isPlayer1)
@@ -127,6 +130,7 @@ module pong_pixel_engine
         .X_OFF(WIDTH-PLAYER_WID)
     ) checkPlayer2 (
         .CLK(pixIf_CLK),
+        .rst_n(rst_n),
         .drawX(pixIf_H_CNT),
         .isValidY(isPlayer2Y),
         .isPlayerPos(isPlayer2)
@@ -138,6 +142,7 @@ module pong_pixel_engine
         .BALL_PIXSIZE(BALL_PIXSIZE)
     ) checkBall (
         .CLK(pixIf_CLK),
+        .rst_n(rst_n),
         .drawX(pixIf_H_CNT),
         .currentX(ballXPos),
         .isValidY(isBallY),
