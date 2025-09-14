@@ -132,13 +132,15 @@ module pong_game_engine_one_hot
     assign tmpPosVar_1 = tmpPosAdd;
     assign tmpPosCmp_1 = tmpPosCmp;
 
+    logic [4:0] negBallSpeed = -ballSpeed;
+    logic [4:0] negPlayerSpeed = -playerSpeed;
+    logic [4:0] b_speed_x = ballMovesPosX ? {1'b0, ballSpeed} : negBallSpeed;
+    logic [4:0] b_speed_y = ballMovesPosY ? {1'b0, ballSpeed} : negBallSpeed;
+    logic [4:0] p1_speed = (BUTTON_LOW_ACTIVE ? player1YDown_reg : player1YUp_reg) ? {1'b0, playerSpeed} : negPlayerSpeed;
+    logic [4:0] p2_speed = (BUTTON_LOW_ACTIVE ? player2YDown_reg : player2YUp_reg) ? {1'b0, playerSpeed} : negPlayerSpeed;
+
     // Control signals
     always_comb begin
-        logic [4:0] b_speed_x = ballMovesPosX ? {1'b0, ballSpeed} : -ballSpeed;
-        logic [4:0] b_speed_y = ballMovesPosY ? {1'b0, ballSpeed} : -ballSpeed;
-        logic [4:0] p1_speed = (BUTTON_LOW_ACTIVE ? player1YDown_reg : player1YUp_reg) ? {1'b0, playerSpeed} : -playerSpeed;
-        logic [4:0] p2_speed = (BUTTON_LOW_ACTIVE ? player2YDown_reg : player2YUp_reg) ? {1'b0, playerSpeed} : -playerSpeed;
-
         // Default values:
         tmpPosVar_2 = tmpPosVar_reg_2;
         tmpPosCmp_2 = tmpPosCmp_reg_2;
