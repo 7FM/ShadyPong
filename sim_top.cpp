@@ -134,6 +134,13 @@ static void run(uint64_t limit, bool dump = true) {
 static void reset() {
     // this module has nothing to reset
     ptop->btns = 0xF;
+    ptop->rst_n = 1;
+    tick(PERIOD * 5, true);
+    ptop->rst_n = 0;
+    tick(PERIOD * 5, true);
+    ptop->rst_n = 1;
+    tick(PERIOD * 5, true);
+
 }
 
 /******************************************************************************/
