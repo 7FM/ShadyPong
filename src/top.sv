@@ -3,6 +3,7 @@
 
 module top (
     input logic CLK,
+    input logic rst_n,     // reset_n - low to reset
     output logic vga_h_sync,
     output logic vga_v_sync,
     output logic [3:0] vga_R, 
@@ -23,22 +24,7 @@ module top (
     */
     assign {player1YUp, player1YDown, player2YUp, player2YDown} = btns;
 
-`ifndef RUN_SIM
-    SB_PLL40_PAD #(
-        .FEEDBACK_PATH("SIMPLE"),
-        .DIVR(`PLL_CLK_DIVR),
-        .DIVF(`PLL_CLK_DIVF),
-        .DIVQ(`PLL_CLK_DIVQ),
-        .FILTER_RANGE(`PLL_CLK_FILTER_RANGE)
-    ) clkGen (
-        .RESETB(`PLL_CLK_RESETB),
-        .BYPASS(`PLL_CLK_BYPASS),
-        .PACKAGEPIN(CLK),
-        .PLLOUTCORE(pixelCLK)
-    );
-`else
     assign pixelCLK = CLK;
-`endif
     localparam WIDTH=`WIDTH;
     localparam HSYNC_FPORCH=`HSYNC_FPORCH;
     localparam HSYNC_PULSE=`HSYNC_PULSE;
@@ -82,29 +68,15 @@ module top (
     localparam LOG_H_SIZE = $clog2(WIDTH);
     localparam LOG_V_SIZE = $clog2(HEIGHT);
 
-`ifdef USE_INTERFACES
-    vga_bus vgaBus();
-    assign vga_h_sync = vgaBus.vga_h_sync;
-    assign vga_v_sync = vgaBus.vga_v_sync;
-    assign vga_R = vgaBus.vga_r;
-    assign vga_G = vgaBus.vga_g;
-    assign vga_B = vgaBus.vga_b;
-
-    pixel_bus #(.H_CNT_WID(LOG_H_SIZE), .V_CNT_WID(LOG_V_SIZE)) pixelBus();
-`else
     logic pixelBus_NEXT_FRAME, pixelBus_H_BLANKING;
     logic [LOG_H_SIZE-1:0] pixelBus_H_CNT;
     logic [LOG_V_SIZE-1:0] pixelBus_next_V_CNT;
     logic [3:0] pixelBus_r;
     logic [3:0] pixelBus_g;
     logic [3:0] pixelBus_b;
-`endif
 
 `ifdef DUMMY_PIXEL_ENGINE
     dummy_pixel_engine #(.H_CNT_WID(LOG_H_SIZE), .V_CNT_WID(LOG_V_SIZE)) pixelCreator (
-`ifdef USE_INTERFACES
-        .pixIf(pixelBus.producer)
-`else
         .pixIf_NEXT_FRAME(pixelBus_NEXT_FRAME),
         .pixIf_H_BLANKING(pixelBus_H_BLANKING),
         .pixIf_H_CNT(pixelBus_H_CNT),
@@ -112,7 +84,6 @@ module top (
         .pixIf_r(pixelBus_r),
         .pixIf_g(pixelBus_g),
         .pixIf_b(pixelBus_b)
-`endif
     );
 `else
     pong_pixel_engine #(
@@ -131,9 +102,6 @@ module top (
         .BG_COL_R(BG_COL_R), .BG_COL_G(BG_COL_G), .BG_COL_B(BG_COL_B)
     ) pixelCreator (
         .pixIf_CLK(pixelCLK),
-`ifdef USE_INTERFACES
-        .pixIf(pixelBus.producer),
-`else
         .pixIf_NEXT_FRAME(pixelBus_NEXT_FRAME),
         .pixIf_H_BLANKING(pixelBus_H_BLANKING),
         .pixIf_H_CNT(pixelBus_H_CNT),
@@ -141,7 +109,6 @@ module top (
         .pixIf_r(pixelBus_r),
         .pixIf_g(pixelBus_g),
         .pixIf_b(pixelBus_b),
-`endif
         .player1YUp(player1YUp), 
         .player1YDown(player1YDown),
         .player2YUp(player2YUp), 
@@ -165,10 +132,6 @@ module top (
         .V_CNT_WID(LOG_V_SIZE)
     ) vgaController(
         .CLK(pixelCLK),
-`ifdef USE_INTERFACES
-        .pixIf(pixelBus.consumer),
-        .vgaIf(vgaBus.control)
-`else
         .pixIf_NEXT_FRAME(pixelBus_NEXT_FRAME),
         .pixIf_H_BLANKING(pixelBus_H_BLANKING),
         .pixIf_H_CNT(pixelBus_H_CNT),
@@ -181,7 +144,6 @@ module top (
         .vgaIf_vga_b(vga_B),
         .vgaIf_vga_h_sync(vga_h_sync),
         .vgaIf_vga_v_sync(vga_v_sync)
-`endif
     );
 
 endmodule

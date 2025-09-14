@@ -15,10 +15,7 @@ module vga_connector
     parameter V_CNT_WID
 )(
     input logic CLK,
-`ifdef USE_INTERFACES
-    pixel_bus.consumer pixIf,
-    vga_bus.control vgaIf
-`else
+    input logic rst_n,     // reset_n - low to reset
     // Pixel bus
     output logic pixIf_NEXT_FRAME,
     output logic pixIf_H_BLANKING,
@@ -33,7 +30,6 @@ module vga_connector
     output logic [3:0] vgaIf_vga_r,
     output logic [3:0] vgaIf_vga_g,
     output logic [3:0] vgaIf_vga_b
-`endif
 );
 
     localparam H_SIZE = WIDTH + HSYNC_FPORCH + HSYNC_PULSE + HSYNC_BPORCH;
@@ -54,21 +50,6 @@ module vga_connector
     logic [3:0] vga_r_reg, vga_g_reg, vga_b_reg;
 
     // Connect busses
-`ifdef USE_INTERFACES
-    // Dummy intermediates
-    logic vgaIf_vga_h_sync, vgaIf_vga_v_sync;
-    logic [3:0] vgaIf_vga_r, vgaIf_vga_g, vgaIf_vga_b;
-    logic pixIf_NEXT_FRAME, pixIf_H_BLANKING;
-    logic [H_CNT_WID-1:0] pixIf_H_CNT;
-    logic [V_CNT_WID-1:0] pixIf_next_V_CNT;
-    logic [3:0] pixIf_r, pixIf_g, pixIf_b;
-    assign {vgaIf.vga_h_sync, vgaIf.vga_v_sync} = {vgaIf_vga_h_sync, vgaIf_vga_v_sync};
-    assign {vgaIf.vga_r, vgaIf.vga_g, vgaIf.vga_b} = {vgaIf_vga_r, vgaIf_vga_g, vgaIf_vga_b};
-    assign {pixIf.NEXT_FRAME, pixIf.H_BLANKING} = {pixIf_NEXT_FRAME, pixIf_H_BLANKING};
-    assign {pixIf.H_CNT, pixIf.next_V_CNT} = {pixIf_H_CNT, pixIf_next_V_CNT};
-    assign {pixIf_r, pixIf_g, pixIf_b} = {pixIf.r, pixIf.g, pixIf.b};
-`endif
-
     assign {vgaIf_vga_h_sync, vgaIf_vga_v_sync} = {h_sync_reg[PIPELINE_STAGES+1], v_sync_reg[PIPELINE_STAGES+1]};
     //assign {vgaIf_vga_h_sync, vgaIf_vga_v_sync} = {h_sync_reg[PIPELINE_STAGES], v_sync_reg[PIPELINE_STAGES]};
     assign {vgaIf_vga_r, vgaIf_vga_g, vgaIf_vga_b} = {vga_r_reg, vga_g_reg, vga_b_reg};
@@ -104,21 +85,21 @@ module vga_connector
     assign hBlanking = h_cnt >= WIDTH;
     assign isInBlanking = hBlanking || v_cnt >= HEIGHT;
 
-    // Initialize registers
-    initial begin
-        {h_cnt, v_cnt} = {LOG_H_SIZE+LOG_V_SIZE{1'b0}};
-        {vga_r_reg, vga_g_reg, vga_b_reg} = {4*3{1'b0}};
-        h_sync_reg = {PIPELINE_STAGES+2{{HSYNC_POLARITY_NEG[0]}}};
-        v_sync_reg = {PIPELINE_STAGES+2{{VSYNC_POLARITY_NEG[0]}}};
-        //{h_sync_reg, v_sync_reg} = {PIPELINE_STAGES+1{{2{SYNC_POLARITY_NEG[0]}}}};
-        blanking = {PIPELINE_STAGES+1{1'b1}};
-    end
-
-    always_ff @(posedge CLK) begin
-        h_cnt <= h_cnt_inc;
-        v_cnt <= v_cnt_inc;
-        h_sync_reg <= {h_sync_reg[PIPELINE_STAGES:0], h_sync_};
-        v_sync_reg <= {v_sync_reg[PIPELINE_STAGES:0], v_sync_};
+    always_ff @(posedge CLK, negedge rst_n) begin
+        // Initialize registers
+        if (~rst_n) begin
+            {h_cnt, v_cnt} = {LOG_H_SIZE+LOG_V_SIZE{1'b0}};
+            {vga_r_reg, vga_g_reg, vga_b_reg} = {4*3{1'b0}};
+            h_sync_reg = {PIPELINE_STAGES+2{{HSYNC_POLARITY_NEG[0]}}};
+            v_sync_reg = {PIPELINE_STAGES+2{{VSYNC_POLARITY_NEG[0]}}};
+            //{h_sync_reg, v_sync_reg} = {PIPELINE_STAGES+1{{2{SYNC_POLARITY_NEG[0]}}}};
+            blanking = {PIPELINE_STAGES+1{1'b1}};
+        end else begin
+            h_cnt <= h_cnt_inc;
+            v_cnt <= v_cnt_inc;
+            h_sync_reg <= {h_sync_reg[PIPELINE_STAGES:0], h_sync_};
+            v_sync_reg <= {v_sync_reg[PIPELINE_STAGES:0], v_sync_};
+        end
     end
 
     // Propergate pipelines

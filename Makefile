@@ -97,7 +97,6 @@ $(syn_target): $(srcs)
 	@echo "============================================================================================"
 
 $(V_DIR)/Vsim_$(TOP_MODULE): sim_$(TOP_MODULE).cpp $(sim_srcs) $(srcs)
-#	$(VERILATOR) -Wall --MMD --MP -DRUN_SIM -DUSE_INTERFACES --Mdir $(V_DIR) --cc -O3 -CFLAGS "$(CCFLAGS)" -LDFLAGS "$(LDFLAGS)" -I$(SRC) --exe sim_$(TOP_MODULE).cpp $(sim_srcs) -sv --top-module sim_$(TOP_MODULE) --trace $(srcs) || true
 	$(VERILATOR) -Wall --MMD --MP -DRUN_SIM --Mdir $(V_DIR) --cc -O3 -CFLAGS "$(CCFLAGS)" -LDFLAGS "$(LDFLAGS)" -I$(SRC) --exe sim_$(TOP_MODULE).cpp $(sim_srcs) -sv --top-module sim_$(TOP_MODULE) --trace $(srcs) || true
 	@echo "============================================================================================"
 	@make -j -C $(V_DIR) -f Vsim_$(TOP_MODULE).mk Vsim_$(TOP_MODULE)

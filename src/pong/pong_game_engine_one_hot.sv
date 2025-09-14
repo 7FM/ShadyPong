@@ -14,6 +14,7 @@ module pong_game_engine_one_hot
 )
 (
     input logic pixIf_CLK,
+    input logic rst_n,     // reset_n - low to reset
     input logic pixIf_NEXT_FRAME,
     input logic player1YUp,
     input logic player1YDown,
@@ -427,38 +428,38 @@ module pong_game_engine_one_hot
     end
 
     // Writeback
-    always_ff @(posedge pixIf_CLK) begin
-        tmpPosVar_reg_1 <= tmpPosVar_1;
-        tmpPosVar_reg_2 <= tmpPosVar_2;
-        tmpPosCmp_reg_1 <= tmpPosCmp_1;
-        tmpPosCmp_reg_2 <= tmpPosCmp_2;
-        tmpPosCmp_reg_3 <= tmpPosCmp_3;
-        tmpPosCmp_reg_4 <= tmpPosCmp_4;
-        ballMovesPosX <= nextBallMovesPosX;
-        ballMovesPosY <= nextBallMovesPosY;
-        player1Pos <= nextPlayer1Pos;
-        player2Pos <= nextPlayer2Pos;
-        ballXPos <= nextBallXPos;
-        ballYPos <= nextBallYPos;
-        {player1YUp_reg, player1YDown_reg, player2YUp_reg, player2YDown_reg} <= {next_player1YUp, next_player1YDown, next_player2YUp, next_player2YDown};
-        // Make moves only after the frame is done drawing!
-        fsmState <= next_fsmState;
-    end
-
-    // Set initial values
-    initial begin
-        fsmState = ({{SCORE_END{1'b0}}, 1'b1} << IDLE);
-        player1Pos = PLAYER_START_POS;
-        player2Pos = PLAYER_START_POS;
-        ballXPos = BALL_START_POS_X_PLAYER_1;
-        ballYPos = BALL_START_POS_Y;
-        ballMovesPosX = 0;
-        ballMovesPosY = 0;
-        player1YUp_reg = BUTTON_LOW_ACTIVE[0];
-        player1YDown_reg = BUTTON_LOW_ACTIVE[0];
-        player2YUp_reg = BUTTON_LOW_ACTIVE[0];
-        player2YDown_reg = BUTTON_LOW_ACTIVE[0];
-        // Other registers are considered as dont care!
+    always_ff @(posedge pixIf_CLK, negedge rst_n) begin
+        // Set initial values
+        if (~rst_n) begin
+            fsmState = ({{SCORE_END{1'b0}}, 1'b1} << IDLE);
+            player1Pos = PLAYER_START_POS;
+            player2Pos = PLAYER_START_POS;
+            ballXPos = BALL_START_POS_X_PLAYER_1;
+            ballYPos = BALL_START_POS_Y;
+            ballMovesPosX = 0;
+            ballMovesPosY = 0;
+            player1YUp_reg = BUTTON_LOW_ACTIVE[0];
+            player1YDown_reg = BUTTON_LOW_ACTIVE[0];
+            player2YUp_reg = BUTTON_LOW_ACTIVE[0];
+            player2YDown_reg = BUTTON_LOW_ACTIVE[0];
+            // Other registers are considered as dont care!
+        end else begin
+            tmpPosVar_reg_1 <= tmpPosVar_1;
+            tmpPosVar_reg_2 <= tmpPosVar_2;
+            tmpPosCmp_reg_1 <= tmpPosCmp_1;
+            tmpPosCmp_reg_2 <= tmpPosCmp_2;
+            tmpPosCmp_reg_3 <= tmpPosCmp_3;
+            tmpPosCmp_reg_4 <= tmpPosCmp_4;
+            ballMovesPosX <= nextBallMovesPosX;
+            ballMovesPosY <= nextBallMovesPosY;
+            player1Pos <= nextPlayer1Pos;
+            player2Pos <= nextPlayer2Pos;
+            ballXPos <= nextBallXPos;
+            ballYPos <= nextBallYPos;
+            {player1YUp_reg, player1YDown_reg, player2YUp_reg, player2YDown_reg} <= {next_player1YUp, next_player1YDown, next_player2YUp, next_player2YDown};
+            // Make moves only after the frame is done drawing!
+            fsmState <= next_fsmState;
+        end
     end
 
     // DEBUG accessors

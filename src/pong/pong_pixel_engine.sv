@@ -15,9 +15,7 @@ module pong_pixel_engine
     parameter BG_COL_R=4'd0, parameter BG_COL_G=4'd0, parameter BG_COL_B=4'd0
 )(
     input logic pixIf_CLK,
-`ifdef USE_INTERFACES
-    pixel_bus.producer pixIf,
-`else
+    input logic rst_n,     // reset_n - low to reset
     input logic pixIf_NEXT_FRAME,
     input logic pixIf_H_BLANKING,
     input logic [H_CNT_WID-1:0] pixIf_H_CNT,
@@ -25,24 +23,11 @@ module pong_pixel_engine
     output logic [3:0] pixIf_r,
     output logic [3:0] pixIf_g,
     output logic [3:0] pixIf_b,
-`endif
     input logic player1YUp, 
     input logic player1YDown,
     input logic player2YUp, 
     input logic player2YDown
 );
-
-`ifdef USE_INTERFACES
-    // Dummy wires
-    logic pixIf_NEXT_FRAME, pixIf_H_BLANKING;
-    logic [H_CNT_WID-1:0] pixIf_H_CNT;
-    logic [V_CNT_WID-1:0] pixIf_next_V_CNT;
-    logic [3:0] pixIf_r, pixIf_g, pixIf_b;
-
-    assign {pixIf_NEXT_FRAME, pixIf_H_BLANKING} = {pixIf.NEXT_FRAME, pixIf.H_BLANKING};
-    assign {pixIf_H_CNT, pixIf_next_V_CNT} = {pixIf.H_CNT, pixIf.next_V_CNT};
-    assign {pixIf.r, pixIf.g, pixIf.b} = {pixIf_r, pixIf_g, pixIf_b};
-`endif
 
     //localparam WIDTH_LOG = $clog2(WIDTH);
     //localparam HEIGHT_LOG = $clog2(HEIGHT);
@@ -86,16 +71,17 @@ module pong_pixel_engine
     // Propergate pipelines
     generate
         if (PIPELINE_STAGES) begin
-            always_ff @(posedge pixIf_CLK) begin
-                isPlayer1_reg <= {isPlayer1_reg[PIPELINE_STAGES-1:0], isPlayer1};
-                isPlayer2_reg <= {isPlayer2_reg[PIPELINE_STAGES-1:0], isPlayer2};
-                isBall_reg <= {isBall_reg[PIPELINE_STAGES-1:0], isBall};
-            end
-            // Initialize registers
-            initial begin
-                isPlayer1_reg = {PIPELINE_STAGES+1{1'b0}};
-                isPlayer2_reg = {PIPELINE_STAGES+1{1'b0}};
-                isBall_reg = {PIPELINE_STAGES+1{1'b0}};
+            always_ff @(posedge pixIf_CLK, negedge rst_n) begin
+                // Initialize registers
+                if (~rst_n) begin
+                    isPlayer1_reg = {PIPELINE_STAGES+1{1'b0}};
+                    isPlayer2_reg = {PIPELINE_STAGES+1{1'b0}};
+                    isBall_reg = {PIPELINE_STAGES+1{1'b0}};
+                end else begin
+                    isPlayer1_reg <= {isPlayer1_reg[PIPELINE_STAGES-1:0], isPlayer1};
+                    isPlayer2_reg <= {isPlayer2_reg[PIPELINE_STAGES-1:0], isPlayer2};
+                    isBall_reg <= {isBall_reg[PIPELINE_STAGES-1:0], isBall};
+                end
             end
         end else begin
             // Well not really regs

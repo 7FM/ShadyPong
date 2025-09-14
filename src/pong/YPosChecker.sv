@@ -8,6 +8,7 @@ module YPosChecker
 )
 (
     input logic CLK,
+    input logic rst_n,     // reset_n - low to reset
     input logic H_BLANK,
     input logic [V_CNT_WID-1:0] nextY,
     input logic [BALL_HEIGHT_LOG-1:0] ballYPos,
@@ -43,12 +44,6 @@ module YPosChecker
     assign cmp_1 = drawY_reg >= cmpOpReg_1;
     assign cmp_2 = drawY_reg < cmpOpReg_2;
 
-    initial begin
-        hBlankingBuf = 1'b0;
-        {isBallY_reg, isPlayer1Y_reg, isPlayer2Y_reg} = 3'b000;
-        fsmState = ({{YPC_WAIT_FOR_LOW_BLANK{1'b0}}, 1'b1} << YPC_IDLE);
-    end
-
     always_comb begin
         next_cmpOpReg_1 = cmpOpReg_1;
         next_cmpOpReg_2 = cmpOpReg_2;
@@ -71,16 +66,24 @@ module YPosChecker
         endcase
     end
 
-    always_ff @(posedge CLK) begin
-        hBlankingBuf <= H_BLANK;
-        fsmState <= triggerNextState ? next_fsmState : fsmState;
-        drawY_reg <= fsmState[YPC_START] ? nextY : drawY_reg;
-        isBallY_reg <= fsmState[YPC_CALC_BALL_Y_VALID] ? cmp_1 && cmp_2 : isBallY_reg;
-        isPlayer1Y_reg <= fsmState[YPC_CALC_PLAYER_1_VALID] ? cmp_1 && cmp_2 : isPlayer1Y_reg;
-        isPlayer2Y_reg <= fsmState[YPC_CALC_PLAYER_2_VALID] ? cmp_1 && cmp_2 : isPlayer2Y_reg;
+    always_ff @(posedge CLK, negedge rst_n) begin
+        // Initialize registers
+        if (~rst_n) begin
+            hBlankingBuf = 1'b0;
+            {isBallY_reg, isPlayer1Y_reg, isPlayer2Y_reg} = 3'b000;
+            fsmState = ({{YPC_WAIT_FOR_LOW_BLANK{1'b0}}, 1'b1} << YPC_IDLE);
+            // TODO initialize more regs?
+        end else begin
+            hBlankingBuf <= H_BLANK;
+            fsmState <= triggerNextState ? next_fsmState : fsmState;
+            drawY_reg <= fsmState[YPC_START] ? nextY : drawY_reg;
+            isBallY_reg <= fsmState[YPC_CALC_BALL_Y_VALID] ? cmp_1 && cmp_2 : isBallY_reg;
+            isPlayer1Y_reg <= fsmState[YPC_CALC_PLAYER_1_VALID] ? cmp_1 && cmp_2 : isPlayer1Y_reg;
+            isPlayer2Y_reg <= fsmState[YPC_CALC_PLAYER_2_VALID] ? cmp_1 && cmp_2 : isPlayer2Y_reg;
 
-        cmpOpReg_1 <= next_cmpOpReg_1;
-        cmpOpReg_2 <= next_cmpOpReg_2;
+            cmpOpReg_1 <= next_cmpOpReg_1;
+            cmpOpReg_2 <= next_cmpOpReg_2;
+        end
     end
 
 endmodule
