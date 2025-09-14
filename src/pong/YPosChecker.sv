@@ -69,9 +69,9 @@ module YPosChecker
     always_ff @(posedge CLK, negedge rst_n) begin
         // Initialize registers
         if (~rst_n) begin
-            hBlankingBuf = 1'b0;
-            {isBallY_reg, isPlayer1Y_reg, isPlayer2Y_reg} = 3'b000;
-            fsmState = ({{YPC_WAIT_FOR_LOW_BLANK{1'b0}}, 1'b1} << YPC_IDLE);
+            hBlankingBuf <= 1'b0;
+            {isBallY_reg, isPlayer1Y_reg, isPlayer2Y_reg} <= 3'b000;
+            fsmState <= ({{YPC_WAIT_FOR_LOW_BLANK{1'b0}}, 1'b1} << YPC_IDLE);
             // TODO initialize more regs?
         end else begin
             hBlankingBuf <= H_BLANK;

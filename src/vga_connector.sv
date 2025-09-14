@@ -88,12 +88,12 @@ module vga_connector
     always_ff @(posedge CLK, negedge rst_n) begin
         // Initialize registers
         if (~rst_n) begin
-            {h_cnt, v_cnt} = {LOG_H_SIZE+LOG_V_SIZE{1'b0}};
-            {vga_r_reg, vga_g_reg, vga_b_reg} = {4*3{1'b0}};
-            h_sync_reg = {PIPELINE_STAGES+2{{HSYNC_POLARITY_NEG[0]}}};
-            v_sync_reg = {PIPELINE_STAGES+2{{VSYNC_POLARITY_NEG[0]}}};
-            //{h_sync_reg, v_sync_reg} = {PIPELINE_STAGES+1{{2{SYNC_POLARITY_NEG[0]}}}};
-            blanking = {PIPELINE_STAGES+1{1'b1}};
+            {h_cnt, v_cnt} <= {LOG_H_SIZE+LOG_V_SIZE{1'b0}};
+            {vga_r_reg, vga_g_reg, vga_b_reg} <= {4*3{1'b0}};
+            h_sync_reg <= {PIPELINE_STAGES+2{{HSYNC_POLARITY_NEG[0]}}};
+            v_sync_reg <= {PIPELINE_STAGES+2{{VSYNC_POLARITY_NEG[0]}}};
+            //{h_sync_reg, v_sync_reg} <= {PIPELINE_STAGES+1{{2{SYNC_POLARITY_NEG[0]}}}};
+            blanking <= {PIPELINE_STAGES+1{1'b1}};
         end else begin
             h_cnt <= h_cnt_inc;
             v_cnt <= v_cnt_inc;

@@ -75,9 +75,9 @@ module pong_pixel_engine
             always_ff @(posedge pixIf_CLK, negedge rst_n) begin
                 // Initialize registers
                 if (~rst_n) begin
-                    isPlayer1_reg = {PIPELINE_STAGES+1{1'b0}};
-                    isPlayer2_reg = {PIPELINE_STAGES+1{1'b0}};
-                    isBall_reg = {PIPELINE_STAGES+1{1'b0}};
+                    isPlayer1_reg <= {PIPELINE_STAGES+1{1'b0}};
+                    isPlayer2_reg <= {PIPELINE_STAGES+1{1'b0}};
+                    isBall_reg <= {PIPELINE_STAGES+1{1'b0}};
                 end else begin
                     isPlayer1_reg <= {isPlayer1_reg[PIPELINE_STAGES-1:0], isPlayer1};
                     isPlayer2_reg <= {isPlayer2_reg[PIPELINE_STAGES-1:0], isPlayer2};
