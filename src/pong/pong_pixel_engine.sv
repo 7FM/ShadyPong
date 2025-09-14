@@ -147,8 +147,8 @@ module pong_pixel_engine
     always_comb begin
         unique casez ({isPlayer1_reg[PIPELINE_STAGES], isPlayer2_reg[PIPELINE_STAGES], isBall_reg[PIPELINE_STAGES]})
             3'b1??: {pixIf_r, pixIf_g, pixIf_b} = {PLAYER_1_COL_R[3:0], PLAYER_1_COL_G[3:0], PLAYER_1_COL_B[3:0]};
-            3'b?1?: {pixIf_r, pixIf_g, pixIf_b} = {PLAYER_2_COL_R[3:0], PLAYER_2_COL_G[3:0], PLAYER_2_COL_B[3:0]};
-            3'b??1: {pixIf_r, pixIf_g, pixIf_b} = {BALL_COL_R[3:0], BALL_COL_G[3:0], BALL_COL_B[3:0]};
+            3'b01?: {pixIf_r, pixIf_g, pixIf_b} = {PLAYER_2_COL_R[3:0], PLAYER_2_COL_G[3:0], PLAYER_2_COL_B[3:0]};
+            3'b001: {pixIf_r, pixIf_g, pixIf_b} = {BALL_COL_R[3:0], BALL_COL_G[3:0], BALL_COL_B[3:0]};
             default: {pixIf_r, pixIf_g, pixIf_b} = {BG_COL_R[3:0], BG_COL_G[3:0], BG_COL_B[3:0]};
         endcase
     end
