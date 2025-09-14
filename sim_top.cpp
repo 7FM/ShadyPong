@@ -47,9 +47,9 @@
 //#define VGA_640_350_85_Hz
 //#define VGA_640_400_70_Hz
 //#define VGA_640_400_85_Hz
-#define VGA_640_480_60_Hz
+// #define VGA_640_480_60_Hz
 //#define VGA_640_480_73_Hz
-// #define VGA_640_480_75_Hz
+#define VGA_640_480_75_Hz
 //#define VGA_640_480_85_Hz
 //#define VGA_640_480_100_Hz
 //#define VGA_720_400_85_Hz
