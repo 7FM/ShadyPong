@@ -89,11 +89,8 @@ module vga_connector
         // Initialize registers
         if (~rst_n) begin
             {h_cnt, v_cnt} <= {LOG_H_SIZE+LOG_V_SIZE{1'b0}};
-            {vga_r_reg, vga_g_reg, vga_b_reg} <= {4*3{1'b0}};
             h_sync_reg <= {PIPELINE_STAGES+2{{HSYNC_POLARITY_NEG[0]}}};
             v_sync_reg <= {PIPELINE_STAGES+2{{VSYNC_POLARITY_NEG[0]}}};
-            //{h_sync_reg, v_sync_reg} <= {PIPELINE_STAGES+1{{2{SYNC_POLARITY_NEG[0]}}}};
-            blanking <= {PIPELINE_STAGES+1{1'b1}};
         end else begin
             h_cnt <= h_cnt_inc;
             v_cnt <= v_cnt_inc;
@@ -105,27 +102,41 @@ module vga_connector
     // Propergate pipelines
     generate
         if (PIPELINE_STAGES) begin
-            always_ff @(posedge CLK) begin
-                blanking <= {blanking[PIPELINE_STAGES-1:0], isInBlanking};
-                //h_sync_reg <= {h_sync_reg[PIPELINE_STAGES-1:0], h_sync_};
-                //v_sync_reg <= {v_sync_reg[PIPELINE_STAGES-1:0], v_sync_};
+            always_ff @(posedge CLK, negedge rst_n) begin
+                if (~rst_n) begin
+                    //{h_sync_reg, v_sync_reg} <= {PIPELINE_STAGES+1{{2{SYNC_POLARITY_NEG[0]}}}};
+                    blanking <= {PIPELINE_STAGES+1{1'b1}};
+                end else begin
+                    blanking <= {blanking[PIPELINE_STAGES-1:0], isInBlanking};
+                    //h_sync_reg <= {h_sync_reg[PIPELINE_STAGES-1:0], h_sync_};
+                    //v_sync_reg <= {v_sync_reg[PIPELINE_STAGES-1:0], v_sync_};
+                end
             end
         end else begin
-            always_ff @(posedge CLK) begin
-                blanking <= isInBlanking;
-                //h_sync_reg <= h_sync_;
-                //v_sync_reg <= v_sync_;
+            always_ff @(posedge CLK, negedge rst_n) begin
+                if (~rst_n) begin
+                    //{h_sync_reg, v_sync_reg} <= {PIPELINE_STAGES+1{{2{SYNC_POLARITY_NEG[0]}}}};
+                    blanking <= {PIPELINE_STAGES+1{1'b1}};
+                end else begin
+                   blanking <= isInBlanking;
+                    //h_sync_reg <= h_sync_;
+                    //v_sync_reg <= v_sync_;
+                end
             end
         end
     endgenerate
 
-    always_ff @(posedge CLK) begin
-        // During Blanking we want the output voltage to be 0V
-        if (blanking[PIPELINE_STAGES]) begin
+    always_ff @(posedge CLK, negedge rst_n) begin
+        if (~rst_n) begin
             {vga_r_reg, vga_g_reg, vga_b_reg} <= {4*3{1'b0}};
         end else begin
-            // Else only apply changes if signal is valid?
-            {vga_r_reg, vga_g_reg, vga_b_reg} <= {pixIf_r, pixIf_g, pixIf_b};
+            // During Blanking we want the output voltage to be 0V
+            if (blanking[PIPELINE_STAGES]) begin
+                {vga_r_reg, vga_g_reg, vga_b_reg} <= {4*3{1'b0}};
+            end else begin
+                // Else only apply changes if signal is valid?
+                {vga_r_reg, vga_g_reg, vga_b_reg} <= {pixIf_r, pixIf_g, pixIf_b};
+            end
         end
     end
 
