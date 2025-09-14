@@ -6,3 +6,4 @@ bin/
 sim_build/
 .vscode/
 .direnv
+sim
