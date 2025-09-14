@@ -4,6 +4,8 @@
 module top (
     input logic CLK,
     input logic rst_n,     // reset_n - low to reset
+    input logic [3:0] ballSpeed,
+    input logic [3:0] playerSpeed,
     output logic vga_h_sync,
     output logic vga_v_sync,
     output logic [3:0] vga_R, 
@@ -48,8 +50,6 @@ module top (
     localparam BALL_PIXSIZE=5;
     localparam PLAYER_LEN=50;
     localparam PLAYER_WID=8;
-    localparam PLAYER_MOVE_SPEED=4;
-    localparam BALL_MOVE_SPEED=4;
 
     localparam BALL_COL_R=4'b1111; 
     localparam BALL_COL_G=4'd0; 
@@ -94,8 +94,6 @@ module top (
         .BALL_PIXSIZE(BALL_PIXSIZE),
         .PLAYER_LEN(PLAYER_LEN),
         .PLAYER_WID(PLAYER_WID),
-        .PLAYER_MOVE_SPEED(PLAYER_MOVE_SPEED),
-        .BALL_MOVE_SPEED(BALL_MOVE_SPEED),
         .BALL_COL_R(BALL_COL_R), .BALL_COL_G(BALL_COL_G), .BALL_COL_B(BALL_COL_B),
         .PLAYER_1_COL_R(PLAYER_1_COL_R), .PLAYER_1_COL_G(PLAYER_1_COL_G), .PLAYER_1_COL_B(PLAYER_1_COL_B),
         .PLAYER_2_COL_R(PLAYER_2_COL_R), .PLAYER_2_COL_G(PLAYER_2_COL_G), .PLAYER_2_COL_B(PLAYER_2_COL_B),
@@ -103,6 +101,8 @@ module top (
     ) pixelCreator (
         .pixIf_CLK(pixelCLK),
         .rst_n(rst_n),
+        .ballSpeed(ballSpeed),
+        .playerSpeed(playerSpeed),
         .pixIf_NEXT_FRAME(pixelBus_NEXT_FRAME),
         .pixIf_H_BLANKING(pixelBus_H_BLANKING),
         .pixIf_H_CNT(pixelBus_H_CNT),

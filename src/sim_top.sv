@@ -12,6 +12,8 @@ module sim_top (
     top uut(
         .CLK(CLK),
         .rst_n(rst_n),
+        .ballSpeed(4),
+        .playerSpeed(4),
         .vga_h_sync(vga_h_sync),
         .vga_v_sync(vga_v_sync),
         .vga_R(vga_R), 

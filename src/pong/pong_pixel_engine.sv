@@ -7,8 +7,6 @@ module pong_pixel_engine
     parameter BALL_PIXSIZE,
     parameter PLAYER_LEN,
     parameter PLAYER_WID,
-    parameter PLAYER_MOVE_SPEED,
-    parameter BALL_MOVE_SPEED,
     parameter BALL_COL_R=4'b1111, parameter BALL_COL_G=4'd0, parameter BALL_COL_B=4'd0,
     parameter PLAYER_1_COL_R=4'd0, parameter PLAYER_1_COL_G=4'b1111, parameter PLAYER_1_COL_B=4'd0,
     parameter PLAYER_2_COL_R=4'd0, parameter PLAYER_2_COL_G=4'd0, parameter PLAYER_2_COL_B=4'b1111,
@@ -16,6 +14,8 @@ module pong_pixel_engine
 )(
     input logic pixIf_CLK,
     input logic rst_n,     // reset_n - low to reset
+    input logic [3:0] ballSpeed,
+    input logic [3:0] playerSpeed,
     input logic pixIf_NEXT_FRAME,
     input logic pixIf_H_BLANKING,
     input logic [H_CNT_WID-1:0] pixIf_H_CNT,
@@ -46,14 +46,14 @@ module pong_pixel_engine
         .BALL_PIXSIZE(BALL_PIXSIZE),
         .PLAYER_LEN(PLAYER_LEN),
         .PLAYER_WID(PLAYER_WID),
-        .PLAYER_MOVE_SPEED(PLAYER_MOVE_SPEED),
-        .BALL_MOVE_SPEED(BALL_MOVE_SPEED),
         .PLAYER_HEIGHT_LOG(PLAYER_HEIGHT_LOG),
         .BALL_HEIGHT_LOG(BALL_HEIGHT_LOG),
         .BALL_WIDTH_LOG(BALL_WIDTH_LOG)
     ) gameEngine (
         .pixIf_CLK(pixIf_CLK),
         .rst_n(rst_n),
+        .ballSpeed(ballSpeed),
+        .playerSpeed(playerSpeed),
         .pixIf_NEXT_FRAME(pixIf_NEXT_FRAME),
         .player1YUp(player1YUp), 
         .player1YDown(player1YDown),

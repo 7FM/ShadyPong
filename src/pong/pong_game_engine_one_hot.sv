@@ -6,8 +6,6 @@ module pong_game_engine_one_hot
     parameter BALL_PIXSIZE,
     parameter PLAYER_LEN,
     parameter PLAYER_WID,
-    parameter PLAYER_MOVE_SPEED,
-    parameter BALL_MOVE_SPEED,
     parameter PLAYER_HEIGHT_LOG,
     parameter BALL_HEIGHT_LOG,
     parameter BALL_WIDTH_LOG
@@ -15,6 +13,8 @@ module pong_game_engine_one_hot
 (
     input logic pixIf_CLK,
     input logic rst_n,     // reset_n - low to reset
+    input logic [3:0] ballSpeed,
+    input logic [3:0] playerSpeed,
     input logic pixIf_NEXT_FRAME,
     input logic player1YUp,
     input logic player1YDown,
@@ -151,7 +151,7 @@ module pong_game_engine_one_hot
         tmpPosCmpOp2 = {{(MAX_POS_LOG + 1 - BALL_WIDTH_LOG){1'b0}}, ballXPos};
         // Default tasks for next boundes pos calculator
         dir = ballMovesPosX;
-        speed = ballMovesPosX ? BALL_MOVE_SPEED : -BALL_MOVE_SPEED;
+        speed = ballMovesPosX ? ballSpeed : -ballSpeed;
         boundary = ballMovesPosX ? WIDTH - BALL_PIXSIZE - PLAYER_WID : PLAYER_WID;
         currentPos = {{(MAX_POS_LOG - BALL_WIDTH_LOG){1'b0}}, ballXPos};
 
@@ -355,10 +355,10 @@ module pong_game_engine_one_hot
                 tmpPosVar_2[0] = tmpPosVar_reg_2[0] || tmpPosCmp_reg_4;
 
                 // Start calculation for next pos ball x
-                // nextBoundedPos #(.UP(1), .POS_LOG_SIZE(BALL_WIDTH_LOG), .SPEED(BALL_MOVE_SPEED), .BOUNDARY(WIDTH - BALL_PIXSIZE - PLAYER_WID)) ballXNextBoundedPosUp (.currentPos(ballXPos), .boundedNextPos(nextBallXPosUp));
-                // nextBoundedPos #(.UP(0), .POS_LOG_SIZE(BALL_WIDTH_LOG), .SPEED(BALL_MOVE_SPEED), .BOUNDARY(PLAYER_WID)) ballXNextBoundedPosDown (.currentPos(ballXPos), .boundedNextPos(nextBallXPosDown));
+                // nextBoundedPos #(.UP(1), .POS_LOG_SIZE(BALL_WIDTH_LOG), .SPEED(ballSpeed), .BOUNDARY(WIDTH - BALL_PIXSIZE - PLAYER_WID)) ballXNextBoundedPosUp (.currentPos(ballXPos), .boundedNextPos(nextBallXPosUp));
+                // nextBoundedPos #(.UP(0), .POS_LOG_SIZE(BALL_WIDTH_LOG), .SPEED(ballSpeed), .BOUNDARY(PLAYER_WID)) ballXNextBoundedPosDown (.currentPos(ballXPos), .boundedNextPos(nextBallXPosDown));
                 dir = ballMovesPosX;
-                speed = ballMovesPosX ? BALL_MOVE_SPEED : -BALL_MOVE_SPEED;
+                speed = ballMovesPosX ? ballSpeed : -ballSpeed;
                 boundary = ballMovesPosX ? WIDTH - BALL_PIXSIZE - PLAYER_WID : PLAYER_WID;
                 currentPos = {{(MAX_POS_LOG - BALL_WIDTH_LOG){1'b0}}, ballXPos};
             end
@@ -380,10 +380,10 @@ module pong_game_engine_one_hot
                 nextBallMovesPosY = tmpPosCmp_reg_2 ~^ ballMovesPosY;
 
                 // Start calculation for next pos player1
-                // nextBoundedPos #(.UP(1), .POS_LOG_SIZE(PLAYER_HEIGHT_LOG), .SPEED(PLAYER_MOVE_SPEED), .BOUNDARY(HEIGHT - PLAYER_LEN)) player1NextBoundedPosUp (.currentPos(player1Pos), .boundedNextPos(nextPlayer1PosUp));
-                // nextBoundedPos #(.UP(0), .POS_LOG_SIZE(PLAYER_HEIGHT_LOG), .SPEED(PLAYER_MOVE_SPEED), .BOUNDARY(0)) player1NextBoundedPosDown (.currentPos(player1Pos), .boundedNextPos(nextPlayer1PosDown));
+                // nextBoundedPos #(.UP(1), .POS_LOG_SIZE(PLAYER_HEIGHT_LOG), .SPEED(playerSpeed), .BOUNDARY(HEIGHT - PLAYER_LEN)) player1NextBoundedPosUp (.currentPos(player1Pos), .boundedNextPos(nextPlayer1PosUp));
+                // nextBoundedPos #(.UP(0), .POS_LOG_SIZE(PLAYER_HEIGHT_LOG), .SPEED(playerSpeed), .BOUNDARY(0)) player1NextBoundedPosDown (.currentPos(player1Pos), .boundedNextPos(nextPlayer1PosDown));
                 dir = (BUTTON_LOW_ACTIVE ? player1YDown_reg : player1YUp_reg);
-                speed = (BUTTON_LOW_ACTIVE ? player1YDown_reg : player1YUp_reg) ? PLAYER_MOVE_SPEED : -PLAYER_MOVE_SPEED;
+                speed = (BUTTON_LOW_ACTIVE ? player1YDown_reg : player1YUp_reg) ? playerSpeed : -playerSpeed;
                 boundary = (BUTTON_LOW_ACTIVE ? player1YDown_reg : player1YUp_reg) ? HEIGHT - PLAYER_LEN : {(MAX_POS_LOG){1'b0}};
                 currentPos = {{(MAX_POS_LOG - PLAYER_HEIGHT_LOG){1'b0}}, player1Pos};
             end
@@ -391,10 +391,10 @@ module pong_game_engine_one_hot
                 nextBallXPos = boundedNextPos[BALL_WIDTH_LOG-1:0];
 
                 // Start calculation for next pos ball y
-                // nextBoundedPos #(.UP(1), .POS_LOG_SIZE(BALL_HEIGHT_LOG), .SPEED(BALL_MOVE_SPEED), .BOUNDARY(HEIGHT - BALL_PIXSIZE)) ballYNextBoundedPosUp (.currentPos(ballYPos), .boundedNextPos(nextBallYPosUp));
-                // nextBoundedPos #(.UP(0), .POS_LOG_SIZE(BALL_HEIGHT_LOG), .SPEED(BALL_MOVE_SPEED), .BOUNDARY(0)) ballYNextBoundedPosDown (.currentPos(ballYPos), .boundedNextPos(nextBallYPosDown));
+                // nextBoundedPos #(.UP(1), .POS_LOG_SIZE(BALL_HEIGHT_LOG), .SPEED(ballSpeed), .BOUNDARY(HEIGHT - BALL_PIXSIZE)) ballYNextBoundedPosUp (.currentPos(ballYPos), .boundedNextPos(nextBallYPosUp));
+                // nextBoundedPos #(.UP(0), .POS_LOG_SIZE(BALL_HEIGHT_LOG), .SPEED(ballSpeed), .BOUNDARY(0)) ballYNextBoundedPosDown (.currentPos(ballYPos), .boundedNextPos(nextBallYPosDown));
                 dir = ballMovesPosY;
-                speed = ballMovesPosY ? BALL_MOVE_SPEED : -BALL_MOVE_SPEED;
+                speed = ballMovesPosY ? ballSpeed : -ballSpeed;
                 boundary = ballMovesPosY ? HEIGHT - BALL_PIXSIZE : {(MAX_POS_LOG){1'b0}};
                 currentPos = {{(MAX_POS_LOG - BALL_HEIGHT_LOG){1'b0}}, ballYPos};
             end
@@ -402,10 +402,10 @@ module pong_game_engine_one_hot
                 nextPlayer1Pos = player1YUp_reg == player1YDown_reg ? player1Pos : boundedNextPos[PLAYER_HEIGHT_LOG-1:0];
 
                 // Start calculation for next pos player2
-                // nextBoundedPos #(.UP(1), .POS_LOG_SIZE(PLAYER_HEIGHT_LOG), .SPEED(PLAYER_MOVE_SPEED), .BOUNDARY(HEIGHT - PLAYER_LEN)) player2NextBoundedPosUp (.currentPos(player2Pos), .boundedNextPos(nextPlayer2PosUp));
-                // nextBoundedPos #(.UP(0), .POS_LOG_SIZE(PLAYER_HEIGHT_LOG), .SPEED(PLAYER_MOVE_SPEED), .BOUNDARY(0)) player2NextBoundedPosDown (.currentPos(player2Pos), .boundedNextPos(nextPlayer2PosDown));
+                // nextBoundedPos #(.UP(1), .POS_LOG_SIZE(PLAYER_HEIGHT_LOG), .SPEED(playerSpeed), .BOUNDARY(HEIGHT - PLAYER_LEN)) player2NextBoundedPosUp (.currentPos(player2Pos), .boundedNextPos(nextPlayer2PosUp));
+                // nextBoundedPos #(.UP(0), .POS_LOG_SIZE(PLAYER_HEIGHT_LOG), .SPEED(playerSpeed), .BOUNDARY(0)) player2NextBoundedPosDown (.currentPos(player2Pos), .boundedNextPos(nextPlayer2PosDown));
                 dir = (BUTTON_LOW_ACTIVE ? player2YDown_reg : player2YUp_reg);
-                speed = (BUTTON_LOW_ACTIVE ? player2YDown_reg : player2YUp_reg) ? PLAYER_MOVE_SPEED : -PLAYER_MOVE_SPEED;
+                speed = (BUTTON_LOW_ACTIVE ? player2YDown_reg : player2YUp_reg) ? playerSpeed : -playerSpeed;
                 boundary = (BUTTON_LOW_ACTIVE ? player2YDown_reg : player2YUp_reg) ? HEIGHT - PLAYER_LEN : {(MAX_POS_LOG){1'b0}};
                 currentPos = {{(MAX_POS_LOG - PLAYER_HEIGHT_LOG){1'b0}}, player2Pos};
             end
