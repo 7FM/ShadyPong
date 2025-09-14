@@ -5,7 +5,6 @@ module playerDrawChecker
     parameter PLAYER_WID,
     parameter X_OFF
 )(
-    input logic CLK,
     input logic [H_CNT_WID-1:0] drawX,
     input logic isValidY,
     output logic isPlayerPos

@@ -5,7 +5,6 @@ module ballDrawChecker
     parameter BALL_WIDTH_LOG,
     parameter BALL_PIXSIZE
 )(
-    input logic CLK,
     input logic [H_CNT_WID-1:0] drawX,
     input logic [BALL_WIDTH_LOG-1:0] currentX,
     input logic isValidY,

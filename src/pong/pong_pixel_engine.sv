@@ -117,8 +117,6 @@ module pong_pixel_engine
         .PLAYER_WID(PLAYER_WID),
         .X_OFF(0)
     ) checkPlayer1 (
-        .CLK(pixIf_CLK),
-        .rst_n(rst_n),
         .drawX(pixIf_H_CNT),
         .isValidY(isPlayer1Y),
         .isPlayerPos(isPlayer1)
@@ -129,8 +127,6 @@ module pong_pixel_engine
         .PLAYER_WID(PLAYER_WID),
         .X_OFF(WIDTH-PLAYER_WID)
     ) checkPlayer2 (
-        .CLK(pixIf_CLK),
-        .rst_n(rst_n),
         .drawX(pixIf_H_CNT),
         .isValidY(isPlayer2Y),
         .isPlayerPos(isPlayer2)
@@ -141,8 +137,6 @@ module pong_pixel_engine
         .BALL_WIDTH_LOG(BALL_WIDTH_LOG),
         .BALL_PIXSIZE(BALL_PIXSIZE)
     ) checkBall (
-        .CLK(pixIf_CLK),
-        .rst_n(rst_n),
         .drawX(pixIf_H_CNT),
         .currentX(ballXPos),
         .isValidY(isBallY),
