@@ -61,8 +61,8 @@ module top (
     localparam PLAYER_2_COL_G=4'd0; 
     localparam PLAYER_2_COL_B=4'b1111;
     localparam BG_COL_R=4'd1;
-    localparam BG_COL_G=4'd2; 
-    localparam BG_COL_B=4'd3;
+    localparam BG_COL_G=4'd1;
+    localparam BG_COL_B=4'd1;
 
     // For the pixels only the visible area needs to be considered
     localparam LOG_H_SIZE = $clog2(WIDTH);
