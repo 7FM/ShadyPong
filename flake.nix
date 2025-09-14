@@ -45,6 +45,8 @@
           #llvmPackages_18.bintoolsNoLibc # ld.lld required for "awesome compiler patcher"
           #llvmPackages_18.clang-unwrapped.python # git-clang-format
           zlib.dev # Needed for verilator fst exports
+
+          SDL2 # Needed for the TB
       ];
 
 

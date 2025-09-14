@@ -1,5 +1,6 @@
 module sim_top (
     input logic CLK,
+    input logic rst_n,
     output logic vga_h_sync,
     output logic vga_v_sync,
     output logic [3:0] vga_R, 
@@ -10,6 +11,7 @@ module sim_top (
 
     top uut(
         .CLK(CLK),
+        .rst_n(rst_n),
         .vga_h_sync(vga_h_sync),
         .vga_v_sync(vga_v_sync),
         .vga_R(vga_R), 
